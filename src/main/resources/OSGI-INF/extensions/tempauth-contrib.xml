@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<component name="org.gots.server.auth.contrib">
+  <!-- Replace Automation specific authentication chain -->
+  <require>org.nuxeo.ecm.platform.ui.web.auth.WebEngineConfig</require>
+  <require>org.nuxeo.ecm.automation.server.auth.config</require>
+  <require>org.nuxeo.ecm.login.token.authentication.contrib</require>
+  <require>org.nuxeo.ecm.platform.oauth2.openid.auth.contrib</require>
+  <extension
+    target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService"
+    point="authenticators"
+  >
+    <authenticationPlugin name="TEMP_TOKEN_AUTH"
+      enabled="true" class="org.gots.server.auth.TemporaryTokenAuthenticator"
+    >
+      <loginModulePlugin>Trusting_LM</loginModulePlugin>
+    </authenticationPlugin>
+  </extension>
+  <extension
+    target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService"
+    point="chain"
+  >
+    <authenticationChain>
+      <plugins>
+        <plugin>BASIC_AUTH</plugin>
+        <plugin>FORM_AUTH</plugin>
+        <plugin>WEBENGINE_FORM_AUTH</plugin>
+        <plugin>OPENID_CONNECT_AUTH</plugin>
+        <plugin>WEBSERVICES_AUTH</plugin>
+        <plugin>ANONYMOUS_AUTH</plugin>
+      </plugins>
+    </authenticationChain>
+  </extension>
+  <extension
+    target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService"
+    point="specificChains"
+  >
+    <documentation> Override Automation specific authentication chain to
+      use token authentication just after basic one, drive and token.
+    </documentation>
+    <specificAuthenticationChain name="Automation">
+      <urlPatterns>
+        <url>(.*)/automation.*</url>
+      </urlPatterns>
+      <replacementChain>
+        <plugin>AUTOMATION_BASIC_AUTH</plugin>
+        <plugin>TOKEN_AUTH</plugin>
+        <plugin>OPENID_CONNECT_AUTH</plugin>
+        <plugin>TEMP_TOKEN_AUTH</plugin>
+        <plugin>ANONYMOUS_AUTH</plugin>
+      </replacementChain>
+    </specificAuthenticationChain>
+    <documentation> Use token authentication if the related request
+      header is sent.
+    </documentation>
+    <specificAuthenticationChain name="TokenAuth">
+      <headers>
+        <header name="X-Temp-Authentication-Token">.*</header>
+      </headers>
+      <replacementChain>
+        <plugin>TEMP_TOKEN_AUTH</plugin>
+      </replacementChain>
+    </specificAuthenticationChain>
+  </extension>
+  
+<extension point="openUrl" target="org.nuxeo.ecm.platform.ui.web.auth.service.PluggableAuthenticationService">
+    <openUrl name="seam-reload">
+      <grantPattern>/nuxeo/RequestAuthenticationTokenByEmail</grantPattern> // RequestAuthenticationTokenByEmail
+    </openUrl>
+  </extension>  
+</component>

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-Vendor: Nuxeo
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Bundle-Version: 1.0.qualifier
+Bundle-Name: gardening-manager-nuxeo
+Nuxeo-Component: OSGI-INF/extensions/org.gots.server.auth.RequestAuthe
+ nticationTokenByEmail.xml,OSGI-INF/extensions/tempauth-contrib.xml
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: gardening-manager-nuxeo
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+
